@@ -1,6 +1,6 @@
 # @skills-cli/cli
 
-> Skills 包管理工具 - 基于 npm 生态的可扩展技能包管理器
+# Skills 包管理工具 - 基于 npm 生态的可扩展技能包管理器
 
 [![npm version](https://badge.fury.io/js/@skills-cli%2Fcli.svg)](https://badge.fury.io/js/@skills-cli%2Fcli)
 
@@ -58,30 +58,6 @@ skills list
 
 ## 详细文档
 
-### 架构设计
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Skills CLI                                    │
-├─────────────────────────────────────────────────────────────────────┤
-│  命令层：init / install / add / remove / update / publish          │
-│             search / info / login / list                            │
-├─────────────────────────────────────────────────────────────────────┤
-│  核心层：                                                     │
-│  • skills.json 读写器                                           │
-│  • npm 命令执行器                                             │
-│  • 配置管理器（~/.skills/）                                    │
-│  • 优先级注册器                                               │
-├─────────────────────────────────────────────────────────────────────┤
-│  底层：                                                       │
-│  • commander - CLI 框架                                        │
-│  • execa - 调用 npm 命令                                       │
-│  • fs-extra - 文件操作                                         │
-│  • chalk - 彩色输出                                           │
-│  • ora - loading 动画                                         │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
 ### skills.json 格式
 
 **项目配置：**
@@ -129,37 +105,6 @@ skills list
 - 支持项目级覆盖 `priorityOverrides`
 - 全局配置存储：`~/.skills/priorities.json`
 
-### 项目结构
-
-```
-skills-cli/
-├── bin/
-│   └── skills.js       # CLI 入口
-├── src/
-│   ├── commands/        # 命令实现
-│   ├── core/            # 核心模块
-│   │   ├── npm-runner.js
-│   │   ├── skills-json.js
-│   │   ├── config.js
-│   │   └── priority.js
-│   ├── utils/          # 工具函数
-│   └── templates/
-│       └── skills.json  # 模板
-├── package.json
-└── README.md
-```
-
-## 开发
-
-```bash
-# 克隆
-git clone https://github.com/your-username/skills-cli.git
-cd skills-cli
-npm install
-npm link  # 全局链接
-
-skills --help  # 测试
-```
 
 ## 创建并发布新 Skill
 
