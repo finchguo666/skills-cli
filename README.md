@@ -4,6 +4,15 @@
 
 Skills CLI 是一个基于 npm 生态的可扩展技能包管理器，核心策略：**调用 npm 完成基础操作，自身只处理 skills.json 和扩展功能**。
 
+## 整体架构
+
+![整体架构图](docs/architecture.png)
+
+流程说明：
+1.  开发者定义 `skills` → 打包成 `npm-packages` → 发布到 `NPM REPO`
+2.  用户通过 `npm install -g @skills-cli/cli` 全局安装 CLI 工具
+3.  在项目中使用 `skills init` 初始化，`skills add` 添加依赖，`skills install` 安装技能
+
 ## 📦 安装
 
 ```bash
