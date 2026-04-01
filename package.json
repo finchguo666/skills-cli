@@ -1,5 +1,5 @@
 {
-  "name": "@skills/cli",
+  "name": "@skills-cli/cli",
   "version": "1.0.0",
   "description": "Skills 包管理工具",
   "bin": {
@@ -12,7 +12,7 @@
     "axios": "^1.5.0",
     "inquirer": "^9.0.0",
     "chalk": "^4.1.2",
-    "ora": "^7.0.0",
+    "ora": "^6.3.1",
     "semver": "^7.5.0"
   },
   "engines": {
