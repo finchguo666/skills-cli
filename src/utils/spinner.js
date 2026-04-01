@@ -1,7 +1,10 @@
 const ora = require('ora');
 
+// handle both commonjs and ESM default exports
+const spinnerFactory = typeof ora === 'function' ? ora : ora.default;
+
 module.exports = function(text) {
-  const spinner = ora(text);
+  const spinner = spinnerFactory(text);
   spinner.start();
 
   return {
