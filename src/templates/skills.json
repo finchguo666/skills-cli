@@ -1,0 +1,9 @@
+{
+  "name": "my-skill",
+  "version": "1.0.0",
+  "description": "My first Skill",
+  "priority": 50,
+  "tags": [],
+  "capabilities": [],
+  "dependencies": {}
+}
