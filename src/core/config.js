@@ -68,6 +68,7 @@ class ConfigManager {
   }
 
   // 注册已安装 Skills 的优先级
+  // 简化实现，直接使用 fs.readdir 不返回 dirent，减少内存分配
   async registerInstalledSkills(nodeModulesPath) {
     // 遍历整个安装目录，找到所有包含 skills.json 的包，不管在哪个 scope
     if (!await fs.pathExists(nodeModulesPath)) {
@@ -78,28 +79,41 @@ class ConfigManager {
     const priorities = await this.getPriorities();
     let changed = false;
 
-    // 使用原生 fs withFileTypes 保证兼容性
-    const items = await readdir(nodeModulesPath, { withFileTypes: true });
+    // 使用 fs.readdir 简单实现，更省内存
+    const items = await readdir(nodeModulesPath);
 
-    for (const dirent of items) {
-      if (!dirent.isDirectory()) continue;
-
-      const item = dirent.name;
+    for (const item of items) {
       const itemPath = path.join(nodeModulesPath, item);
+      // 检查是否是目录（同步检查更快更省内存）
+      try {
+        const stat = fsNative.statSync(itemPath);
+        if (!stat.isDirectory()) continue;
+      } catch (e) {
+        continue;
+      }
 
       // 如果是 scope 目录（以 @ 开头），遍历里面的包
       if (item.startsWith('@')) {
-        const packages = await readdir(itemPath, { withFileTypes: true });
-        for (const pkgDirent of packages) {
-          if (!pkgDirent.isDirectory()) continue;
-          const pkg = pkgDirent.name;
-          await this.tryRegisterSkill(path.join(itemPath, pkg), `${item}/${pkg}`, priorities);
-          changed = true;
+        const packages = await readdir(itemPath);
+        for (const pkg of packages) {
+          try {
+            const pkgPath = path.join(itemPath, pkg);
+            const stat = fsNative.statSync(pkgPath);
+            if (!stat.isDirectory()) continue;
+            await this.tryRegisterSkill(pkgPath, `${item}/${pkg}`, priorities);
+            changed = true;
+          } catch (e) {
+            continue;
+          }
         }
       } else {
         // unscoped 包
-        await this.tryRegisterSkill(itemPath, item, priorities);
-        changed = true;
+        try {
+          await this.tryRegisterSkill(itemPath, item, priorities);
+          changed = true;
+        } catch (e) {
+          continue;
+        }
       }
     }
 
