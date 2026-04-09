@@ -65,20 +65,40 @@ class ConfigManager {
 
   // 注册已安装 Skills 的优先级
   async registerInstalledSkills(nodeModulesPath) {
-    const skillsPath = path.join(nodeModulesPath, '@skills');
-    if (!await fs.pathExists(skillsPath)) {
+    // 遍历整个安装目录，找到所有包含 skills.json 的包，不管在哪个 scope
+    if (!await fs.pathExists(nodeModulesPath)) {
       return;
     }
 
-    const skills = await fs.readdir(skillsPath);
+    // 读取根目录下（包括 scopes 目录比如 @skills-cli）
+    const items = await fs.readdir(nodeModulesPath);
 
-    for (const skill of skills) {
-      const skillJsonPath = path.join(skillsPath, skill, 'skills.json');
-      if (await fs.pathExists(skillJsonPath)) {
-        const skillConfig = await fs.readJson(skillJsonPath);
-        const priority = skillConfig.priority || 50;
-        await this.setPriority(`@skills/${skill}`, priority);
+    for (const item of items) {
+      const itemPath = path.join(nodeModulesPath, item);
+      const stat = await fs.stat(itemPath);
+
+      if (stat.isDirectory()) {
+        // 如果是 scope 目录（以 @ 开头），遍历里面的包
+        if (item.startsWith('@')) {
+          const packages = await fs.readdir(itemPath);
+          for (const pkg of packages) {
+            await this.tryRegisterSkill(path.join(itemPath, pkg), `${item}/${pkg}`);
+          }
+        } else {
+          //  unscoped 包
+          await this.tryRegisterSkill(itemPath, item);
+        }
       }
+    }
+  }
+
+  // 尝试注册单个包
+  async tryRegisterSkill(packagePath, fullPackageName) {
+    const skillJsonPath = path.join(packagePath, 'skills.json');
+    if (await fs.pathExists(skillJsonPath)) {
+      const skillConfig = await fs.readJson(skillJsonPath);
+      const priority = skillConfig.priority || 50;
+      await this.setPriority(fullPackageName, priority);
     }
   }
 }
