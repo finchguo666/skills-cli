@@ -27,9 +27,9 @@ class NpmRunner {
   async install(packages = [], options = {}) {
     const args = ['install'];
 
-    // 指定 modules 安装目录（必须放在包名前面，否则npm会误识别为包名）
+    // 指定 modules 安装目录（使用 --name=value 格式避免npm误解析为包名）
     if (this.modulesFolder) {
-      args.push('--modules-folder', this.modulesFolder);
+      args.push(`--modules-folder=${this.modulesFolder}`);
     }
 
     if (packages.length > 0) {
@@ -47,7 +47,7 @@ class NpmRunner {
     }
 
     const registry = await this.getRegistry();
-    args.push('--registry', registry);
+    args.push(`--registry=${registry}`);
 
     const result = await execa('npm', args, {
       cwd: this.cwd,
@@ -63,7 +63,7 @@ class NpmRunner {
 
     // 指定 modules 安装目录
     if (this.modulesFolder) {
-      args.push('--modules-folder', this.modulesFolder);
+      args.push(`--modules-folder=${this.modulesFolder}`);
     }
 
     args.push(...packages);
@@ -86,7 +86,7 @@ class NpmRunner {
 
     // 指定 modules 安装目录
     if (this.modulesFolder) {
-      args.push('--modules-folder', this.modulesFolder);
+      args.push(`--modules-folder=${this.modulesFolder}`);
     }
 
     if (packages.length > 0) {
@@ -114,7 +114,7 @@ class NpmRunner {
     }
 
     const registry = await this.getRegistry();
-    args.push('--registry', registry);
+    args.push(`--registry=${registry}`);
 
     const result = await execa('npm', args, {
       cwd: this.cwd,
