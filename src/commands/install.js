@@ -1,6 +1,5 @@
 const NpmRunner = require('../core/npm-runner');
 const SkillsJson = require('../core/skills-json');
-const ConfigManager = require('../core/config');
 const spinner = require('../utils/spinner');
 const chalk = require('chalk');
 
@@ -31,32 +30,17 @@ module.exports = async function install() {
     const npm = new NpmRunner(process.cwd(), modulesDir);
     await npm.install(packages);
 
-    // 5. 注册优先级（后台异步执行，不阻塞安装完成）
-    spin.stop();
-    console.log(chalk.cyan('  正在安装依赖...'));
-    const config = new ConfigManager();
+    spin.succeed('Skills 依赖安装完成');
 
-    // 异步注册，不阻塞，安装完成立刻输出结果
-    setImmediate(async () => {
-      try {
-        await config.registerInstalledSkills(modulesDir);
-        // 注册完成后输出列表
-        console.log(chalk.green('  ✓ 优先级注册完成'));
-        console.log(chalk.cyan('\n已安装的 Skills:'));
-        // 一次性读取所有优先级
-        const allPriorities = await config.getPriorities();
-        for (const name of packages) {
-          const priority = allPriorities[name] || 50;
-          console.log(chalk.dim(`  ${name} (优先级: ${priority})`));
-        }
-      } catch (e) {
-        console.log(chalk.yellow(`  ⚠  优先级注册警告: ${e.message}`));
+    // 输出已安装的 Skills
+    const skillNames = Object.keys(allDeps);
+
+    if (skillNames.length > 0) {
+      console.log(chalk.cyan('\n已安装的 Skills:'));
+      for (const name of skillNames) {
+        console.log(chalk.dim(`  ${name}`));
       }
-    });
-
-    const spin2 = spinner('');
-    spin2.succeed('Skills 依赖安装完成');
-    console.log(chalk.dim('  优先级正在后台注册...完成后会自动输出列表'));
+    }
 
   } catch (error) {
     spin.fail(`安装失败: ${error.message}`);

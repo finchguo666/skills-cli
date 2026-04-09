@@ -1,6 +1,5 @@
 const NpmRunner = require('../core/npm-runner');
 const SkillsJson = require('../core/skills-json');
-const ConfigManager = require('../core/config');
 const spinner = require('../utils/spinner');
 const chalk = require('chalk');
 
@@ -33,23 +32,7 @@ module.exports = async function update(packages) {
     const npm = new NpmRunner(process.cwd(), modulesDir);
     await npm.update(targetPackages);
 
-    // 5. 重新注册优先级（后台异步执行，不阻塞）
-    spin.stop();
-    console.log(chalk.cyan('  正在更新依赖...'));
-    const config = new ConfigManager();
-
-    // 异步注册，不阻塞
-    setImmediate(async () => {
-      try {
-        await config.registerInstalledSkills(modulesDir);
-        console.log(chalk.green('  ✓ 优先级更新完成'));
-      } catch (e) {
-        console.log(chalk.yellow(`  ⚠  优先级更新警告: ${e.message}`));
-      }
-    });
-
-    const spin2 = spinner('');
-    spin2.succeed('Skills 更新完成');
+    spin.succeed('Skills 更新完成');
 
   } catch (error) {
     spin.fail(`更新失败: ${error.message}`);

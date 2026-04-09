@@ -1,11 +1,9 @@
 const SkillsJson = require('../core/skills-json');
-const ConfigManager = require('../core/config');
 const chalk = require('chalk');
 
 module.exports = async function list() {
   try {
     const skillsJson = new SkillsJson();
-    const config = new ConfigManager();
 
     if (!await skillsJson.exists()) {
       console.log(chalk.yellow('skills.json 不存在，请先运行 skills init'));
@@ -25,13 +23,10 @@ module.exports = async function list() {
 
     console.log(chalk.cyan(`\n已安装的 Skills (共 ${skillNames.length} 个):\n`));
 
-    // 一次性读取所有优先级，减少 IO 操作
-    const allPriorities = await config.getPriorities();
     for (const name of skillNames) {
       const version = allDeps[name];
-      const priority = allPriorities[name] || 50;
       const isDev = devDeps[name] ? ' (dev)' : '';
-      console.log(chalk.dim(`  ${name}@${version} — 优先级: ${priority}${isDev}`));
+      console.log(chalk.dim(`  ${name}@${version}${isDev}`));
     }
 
     console.log();
