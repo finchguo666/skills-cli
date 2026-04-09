@@ -37,7 +37,12 @@ skills init
 {
   "name": "your-project",
   "version": "1.0.0",
-  "dependencies": {}
+  "description": "",
+  "installDirectory": "skills_modules",
+  "dependencies": {},
+  "devDependencies": {},
+  "priorityOverrides": {},
+  "config": {}
 }
 ```
 
@@ -67,6 +72,27 @@ skills i
 1. 读取 `skills.json` 中的所有依赖
 2. 调用 `npm install` 安装所有 npm 包
 3. 自动注册所有 Skill 的优先级配置到全局
+
+### 配置安装目录
+
+Skills 默认安装到项目根目录下的 `skills_modules` 目录，与 `node_modules` 分离。如果你想要修改安装目录，可以在 `skills.json` 中配置：
+
+```json
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "installDirectory": "skills_modules",
+  "dependencies": {}
+}
+```
+
+如果需要回退到使用 `node_modules`，修改为：
+
+```json
+{
+  "installDirectory": "node_modules"
+}
+```
 
 ### 4. 日常使用命令
 
