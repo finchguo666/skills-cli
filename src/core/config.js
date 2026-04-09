@@ -70,6 +70,10 @@ class ConfigManager {
       return;
     }
 
+    // 一次性读取所有当前优先级，减少 IO
+    const priorities = await this.getPriorities();
+    let changed = false;
+
     // 读取根目录下（包括 scopes 目录比如 @skills-cli）
     const items = await fs.readdir(nodeModulesPath);
 
@@ -82,23 +86,30 @@ class ConfigManager {
         if (item.startsWith('@')) {
           const packages = await fs.readdir(itemPath);
           for (const pkg of packages) {
-            await this.tryRegisterSkill(path.join(itemPath, pkg), `${item}/${pkg}`);
+            await this.tryRegisterSkill(path.join(itemPath, pkg), `${item}/${pkg}`, priorities);
+            changed = true;
           }
         } else {
           //  unscoped 包
-          await this.tryRegisterSkill(itemPath, item);
+          await this.tryRegisterSkill(itemPath, item, priorities);
+          changed = true;
         }
       }
+    }
+
+    // 如果有变更，只写入一次
+    if (changed) {
+      await fs.writeJson(this.priorityPath, priorities, { spaces: 2 });
     }
   }
 
   // 尝试注册单个包
-  async tryRegisterSkill(packagePath, fullPackageName) {
+  async tryRegisterSkill(packagePath, fullPackageName, priorities) {
     const skillJsonPath = path.join(packagePath, 'skills.json');
     if (await fs.pathExists(skillJsonPath)) {
       const skillConfig = await fs.readJson(skillJsonPath);
       const priority = skillConfig.priority || 50;
-      await this.setPriority(fullPackageName, priority);
+      priorities[fullPackageName] = priority;
     }
   }
 }
