@@ -74,26 +74,28 @@ class ConfigManager {
     const priorities = await this.getPriorities();
     let changed = false;
 
-    // 读取根目录下（包括 scopes 目录比如 @skills-cli）
-    const items = await fs.readdir(nodeModulesPath);
+    // 使用 withFileTypes 直接获取文件类型，减少额外 stat 调用
+    const items = await fs.readdir(nodeModulesPath, { withFileTypes: true });
 
-    for (const item of items) {
+    for (const dirent of items) {
+      if (!dirent.isDirectory()) continue;
+
+      const item = dirent.name;
       const itemPath = path.join(nodeModulesPath, item);
-      const stat = await fs.stat(itemPath);
 
-      if (stat.isDirectory()) {
-        // 如果是 scope 目录（以 @ 开头），遍历里面的包
-        if (item.startsWith('@')) {
-          const packages = await fs.readdir(itemPath);
-          for (const pkg of packages) {
-            await this.tryRegisterSkill(path.join(itemPath, pkg), `${item}/${pkg}`, priorities);
-            changed = true;
-          }
-        } else {
-          //  unscoped 包
-          await this.tryRegisterSkill(itemPath, item, priorities);
+      // 如果是 scope 目录（以 @ 开头），遍历里面的包
+      if (item.startsWith('@')) {
+        const packages = await fs.readdir(itemPath, { withFileTypes: true });
+        for (const pkgDirent of packages) {
+          if (!pkgDirent.isDirectory()) continue;
+          const pkg = pkgDirent.name;
+          await this.tryRegisterSkill(path.join(itemPath, pkg), `${item}/${pkg}`, priorities);
           changed = true;
         }
+      } else {
+        // unscoped 包
+        await this.tryRegisterSkill(itemPath, item, priorities);
+        changed = true;
       }
     }
 
