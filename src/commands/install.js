@@ -15,17 +15,23 @@ module.exports = async function install() {
       return;
     }
 
-    // 2. 获取安装目录配置，默认使用 skills_modules
+    // 2. 获取所有 skills 依赖
+    const deps = await skillsJson.getDependencies();
+    const devDeps = await skillsJson.getDevDependencies();
+    const allDeps = { ...deps, ...devDeps };
+    const packages = Object.keys(allDeps);
+
+    // 3. 获取安装目录配置，默认使用 skills_modules
     const skillsData = await skillsJson.read();
     const modulesDir = skillsData && skillsData.installDirectory
       ? skillsData.installDirectory
       : 'skills_modules';
 
-    // 3. 调用 npm install
+    // 4. 调用 npm install 安装 skills 依赖到指定目录
     const npm = new NpmRunner(process.cwd(), modulesDir);
-    await npm.install();
+    await npm.install(packages);
 
-    // 4. 注册优先级
+    // 5. 注册优先级
     spin.text = '正在注册 Skills 优先级...';
     const config = new ConfigManager();
     await config.registerInstalledSkills(modulesDir);
