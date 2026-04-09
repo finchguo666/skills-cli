@@ -3,8 +3,9 @@ const fs = require('fs-extra');
 const path = require('path');
 
 class NpmRunner {
-  constructor(cwd = process.cwd()) {
+  constructor(cwd = process.cwd(), modulesFolder = null) {
     this.cwd = cwd;
+    this.modulesFolder = modulesFolder;
   }
 
   // 获取 Registry 配置
@@ -40,6 +41,11 @@ class NpmRunner {
       args.push('-g');
     }
 
+    // 指定 modules 安装目录
+    if (this.modulesFolder) {
+      args.push('--modules-folder', this.modulesFolder);
+    }
+
     const registry = await this.getRegistry();
     args.push('--registry', registry);
 
@@ -59,6 +65,11 @@ class NpmRunner {
       args.push('-g');
     }
 
+    // 指定 modules 安装目录
+    if (this.modulesFolder) {
+      args.push('--modules-folder', this.modulesFolder);
+    }
+
     const result = await execa('npm', args, {
       cwd: this.cwd,
       stdio: 'inherit'
@@ -70,6 +81,11 @@ class NpmRunner {
   // 执行 npm update
   async update(packages = []) {
     const args = ['update', ...packages];
+
+    // 指定 modules 安装目录
+    if (this.modulesFolder) {
+      args.push('--modules-folder', this.modulesFolder);
+    }
 
     const result = await execa('npm', args, {
       cwd: this.cwd,

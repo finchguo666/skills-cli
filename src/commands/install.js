@@ -15,14 +15,20 @@ module.exports = async function install() {
       return;
     }
 
-    // 2. 调用 npm install
-    const npm = new NpmRunner();
+    // 2. 获取安装目录配置，默认使用 skills_modules
+    const skillsData = await skillsJson.read();
+    const modulesDir = skillsData && skillsData.installDirectory
+      ? skillsData.installDirectory
+      : 'skills_modules';
+
+    // 3. 调用 npm install
+    const npm = new NpmRunner(process.cwd(), modulesDir);
     await npm.install();
 
-    // 3. 注册优先级
+    // 4. 注册优先级
     spin.text = '正在注册 Skills 优先级...';
     const config = new ConfigManager();
-    await config.registerInstalledSkills('./node_modules');
+    await config.registerInstalledSkills(modulesDir);
 
     spin.succeed('Skills 安装完成');
 

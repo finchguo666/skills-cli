@@ -21,8 +21,14 @@ module.exports = async function remove(packages) {
 
     await skillsJson.removeDependency(packages);
 
-    // 2. 调用 npm uninstall
-    const npm = new NpmRunner();
+    // 2. 获取安装目录配置
+    const skillsData = await skillsJson.read();
+    const modulesDir = skillsData && skillsData.installDirectory
+      ? skillsData.installDirectory
+      : 'skills_modules';
+
+    // 3. 调用 npm uninstall
+    const npm = new NpmRunner(process.cwd(), modulesDir);
     await npm.uninstall(fullPackageNames);
 
     spin.succeed(`已移除 ${packages.join(', ')}`);

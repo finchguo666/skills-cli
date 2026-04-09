@@ -16,8 +16,14 @@ module.exports = async function add(packages, options) {
 
     await skillsJson.addDependency(packages, options.saveDev);
 
-    // 2. 调用 npm install
-    const npm = new NpmRunner();
+    // 2. 获取安装目录配置，默认使用 skills_modules
+    const skillsData = await skillsJson.read();
+    const modulesDir = skillsData && skillsData.installDirectory
+      ? skillsData.installDirectory
+      : 'skills_modules';
+
+    // 3. 调用 npm install
+    const npm = new NpmRunner(process.cwd(), modulesDir);
     await npm.install(packages, {
       saveDev: options.saveDev,
       save: true

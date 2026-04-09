@@ -100,6 +100,8 @@ class SkillsJson {
       name: name,
       version: '1.0.0',
       description: '',
+      // 安装目录，默认为 skills_modules，如需使用 node_modules 可改为 "node_modules"
+      installDirectory: 'skills_modules',
       dependencies: {},
       devDependencies: {},
       priorityOverrides: {},

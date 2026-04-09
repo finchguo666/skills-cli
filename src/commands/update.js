@@ -23,14 +23,20 @@ module.exports = async function update(packages) {
       targetPackages = [...Object.keys(deps), ...Object.keys(devDeps)];
     }
 
-    // 3. 执行 npm update
-    const npm = new NpmRunner();
+    // 3. 获取安装目录配置
+    const skillsData = await skillsJson.read();
+    const modulesDir = skillsData && skillsData.installDirectory
+      ? skillsData.installDirectory
+      : 'skills_modules';
+
+    // 4. 执行 npm update
+    const npm = new NpmRunner(process.cwd(), modulesDir);
     await npm.update(targetPackages);
 
-    // 4. 重新注册优先级
+    // 5. 重新注册优先级
     spin.text = '正在重新注册 Skills 优先级...';
     const config = new ConfigManager();
-    await config.registerInstalledSkills('./node_modules');
+    await config.registerInstalledSkills(modulesDir);
 
     spin.succeed('Skills 更新完成');
 
