@@ -23,13 +23,43 @@ class NpmRunner {
     return 'https://registry.npmjs.org';
   }
 
+  // 后处理：将 prefix 安装的 node_modules 移动到目标目录
+  async postInstallMove() {
+    if (!this.modulesFolder) return;
+
+    const targetDir = path.resolve(this.cwd, this.modulesFolder);
+    const tempNodeModules = path.resolve(this.cwd, this.modulesFolder, 'node_modules');
+    const tempPackageJson = path.resolve(this.cwd, this.modulesFolder, 'package.json');
+    const tempPackageLock = path.resolve(this.cwd, this.modulesFolder, 'package-lock.json');
+
+    // 确保目标目录存在
+    await fs.ensureDir(targetDir);
+
+    // 如果临时 node_modules 存在，移动内容到目标
+    if (await fs.pathExists(tempNodeModules)) {
+      const items = await fs.readdir(tempNodeModules);
+      for (const item of items) {
+        const src = path.join(tempNodeModules, item);
+        const dest = path.join(targetDir, item);
+        await fs.move(src, dest, { overwrite: true });
+      }
+      // 删除空的 node_modules
+      await fs.remove(tempNodeModules);
+    }
+
+    // 删除临时的 package.json 和 lock 文件（保持当前目录的就可以了）
+    await fs.remove(tempPackageJson);
+    await fs.remove(tempPackageLock);
+  }
+
   // 执行 npm install
   async install(packages = [], options = {}) {
     const args = ['install'];
 
-    // 指定 modules 安装目录（使用 --name=value 格式避免npm误解析为包名）
+    // 指定 modules 安装目录
     if (this.modulesFolder) {
-      args.push(`--modules-folder=${this.modulesFolder}`);
+      // 使用 --prefix 安装，之后再移动内容
+      args.push(`--prefix=${this.modulesFolder}`);
     }
 
     if (packages.length > 0) {
@@ -54,6 +84,11 @@ class NpmRunner {
       stdio: 'inherit'
     });
 
+    // 如果自定义了安装目录，移动文件
+    if (this.modulesFolder) {
+      await this.postInstallMove();
+    }
+
     return result;
   }
 
@@ -63,7 +98,7 @@ class NpmRunner {
 
     // 指定 modules 安装目录
     if (this.modulesFolder) {
-      args.push(`--modules-folder=${this.modulesFolder}`);
+      args.push(`--prefix=${this.modulesFolder}`);
     }
 
     args.push(...packages);
@@ -77,6 +112,11 @@ class NpmRunner {
       stdio: 'inherit'
     });
 
+    // 如果自定义了安装目录，清理
+    if (this.modulesFolder) {
+      await this.postInstallMove();
+    }
+
     return result;
   }
 
@@ -86,7 +126,7 @@ class NpmRunner {
 
     // 指定 modules 安装目录
     if (this.modulesFolder) {
-      args.push(`--modules-folder=${this.modulesFolder}`);
+      args.push(`--prefix=${this.modulesFolder}`);
     }
 
     if (packages.length > 0) {
@@ -97,6 +137,11 @@ class NpmRunner {
       cwd: this.cwd,
       stdio: 'inherit'
     });
+
+    // 如果自定义了安装目录，移动文件
+    if (this.modulesFolder) {
+      await this.postInstallMove();
+    }
 
     return result;
   }
