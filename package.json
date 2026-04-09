@@ -1,6 +1,6 @@
 {
   "name": "@skills-cli/cli",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Skills 包管理工具",
   "bin": {
     "skills": "./bin/skills.js"
