@@ -75,4 +75,9 @@ program
   .description('列出已安装的 Skills')
   .action(() => require('../src/commands/list')());
 
+program
+  .command('clean')
+  .description('清理 skills_modules 目录')
+  .action(() => require('../src/commands/clean')());
+
 program.parse();
