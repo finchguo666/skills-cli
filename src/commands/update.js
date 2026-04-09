@@ -34,7 +34,9 @@ module.exports = async function update(packages) {
     await npm.update(targetPackages);
 
     // 5. 重新注册优先级
-    spin.text = '正在重新注册 Skills 优先级...';
+    // stop spinner 并重新输出提示，避免 npm 输出后 spinner 错乱
+    spin.stopAndPersist({ symbol: ' ', text: ' ' });
+    console.log(chalk.cyan('  正在重新注册 Skills 优先级...'));
     const config = new ConfigManager();
     await config.registerInstalledSkills(modulesDir);
 
