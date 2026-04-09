@@ -35,12 +35,13 @@ module.exports = async function update(packages) {
 
     // 5. 重新注册优先级
     // stop spinner 并重新输出提示，避免 npm 输出后 spinner 错乱
-    spin.stopAndPersist({ symbol: ' ', text: ' ' });
+    spin.stop();
     console.log(chalk.cyan('  正在重新注册 Skills 优先级...'));
     const config = new ConfigManager();
     await config.registerInstalledSkills(modulesDir);
 
-    spin.succeed('Skills 更新完成');
+    const spin2 = spinner('');
+    spin2.succeed('Skills 更新完成');
 
   } catch (error) {
     spin.fail(`更新失败: ${error.message}`);

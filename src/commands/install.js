@@ -33,12 +33,13 @@ module.exports = async function install() {
 
     // 5. 注册优先级
     // stop spinner 并重新输出提示，避免 npm 输出后 spinner 错乱
-    spin.stopAndPersist({ symbol: ' ', text: ' ' });
+    spin.stop();
     console.log(chalk.cyan('  正在注册 Skills 优先级...'));
     const config = new ConfigManager();
     await config.registerInstalledSkills(modulesDir);
 
-    spin.succeed('Skills 安装完成');
+    const spin2 = spinner('');
+    spin2.succeed('Skills 安装完成');
 
     // 输出已安装的 Skills
     const skillNames = Object.keys(allDeps);
