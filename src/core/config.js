@@ -1,6 +1,10 @@
 const fs = require('fs-extra');
+const fsNative = require('fs');
 const path = require('path');
 const os = require('os');
+const util = require('util');
+
+const readdir = util.promisify(fsNative.readdir);
 
 class ConfigManager {
   constructor() {
@@ -74,8 +78,8 @@ class ConfigManager {
     const priorities = await this.getPriorities();
     let changed = false;
 
-    // 使用 withFileTypes 直接获取文件类型，减少额外 stat 调用
-    const items = await fs.readdir(nodeModulesPath, { withFileTypes: true });
+    // 使用原生 fs withFileTypes 保证兼容性
+    const items = await readdir(nodeModulesPath, { withFileTypes: true });
 
     for (const dirent of items) {
       if (!dirent.isDirectory()) continue;
@@ -85,7 +89,7 @@ class ConfigManager {
 
       // 如果是 scope 目录（以 @ 开头），遍历里面的包
       if (item.startsWith('@')) {
-        const packages = await fs.readdir(itemPath, { withFileTypes: true });
+        const packages = await readdir(itemPath, { withFileTypes: true });
         for (const pkgDirent of packages) {
           if (!pkgDirent.isDirectory()) continue;
           const pkg = pkgDirent.name;
