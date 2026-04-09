@@ -43,8 +43,10 @@ module.exports = async function install() {
 
     if (skillNames.length > 0) {
       console.log(chalk.cyan('\n已安装的 Skills:'));
+      // 一次性读取所有优先级，减少 IO 操作
+      const allPriorities = await config.getPriorities();
       for (const name of skillNames) {
-        const priority = await config.getPriority(name);
+        const priority = allPriorities[name] || 50;
         console.log(chalk.dim(`  ${name} (优先级: ${priority})`));
       }
     }
