@@ -25,9 +25,11 @@ module.exports = async function list() {
 
     console.log(chalk.cyan(`\n已安装的 Skills (共 ${skillNames.length} 个):\n`));
 
+    // 一次性读取所有优先级，减少 IO 操作
+    const allPriorities = await config.getPriorities();
     for (const name of skillNames) {
       const version = allDeps[name];
-      const priority = await config.getPriority(name);
+      const priority = allPriorities[name] || 50;
       const isDev = devDeps[name] ? ' (dev)' : '';
       console.log(chalk.dim(`  ${name}@${version} — 优先级: ${priority}${isDev}`));
     }
