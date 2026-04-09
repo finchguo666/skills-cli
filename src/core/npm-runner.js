@@ -27,6 +27,11 @@ class NpmRunner {
   async install(packages = [], options = {}) {
     const args = ['install'];
 
+    // 指定 modules 安装目录（必须放在包名前面，否则npm会误识别为包名）
+    if (this.modulesFolder) {
+      args.push('--modules-folder', this.modulesFolder);
+    }
+
     if (packages.length > 0) {
       args.push(...packages);
     }
@@ -39,11 +44,6 @@ class NpmRunner {
 
     if (options.global) {
       args.push('-g');
-    }
-
-    // 指定 modules 安装目录
-    if (this.modulesFolder) {
-      args.push('--modules-folder', this.modulesFolder);
     }
 
     const registry = await this.getRegistry();
@@ -59,15 +59,17 @@ class NpmRunner {
 
   // 执行 npm uninstall
   async uninstall(packages, options = {}) {
-    const args = ['uninstall', ...packages];
-
-    if (options.global) {
-      args.push('-g');
-    }
+    const args = ['uninstall'];
 
     // 指定 modules 安装目录
     if (this.modulesFolder) {
       args.push('--modules-folder', this.modulesFolder);
+    }
+
+    args.push(...packages);
+
+    if (options.global) {
+      args.push('-g');
     }
 
     const result = await execa('npm', args, {
@@ -80,11 +82,15 @@ class NpmRunner {
 
   // 执行 npm update
   async update(packages = []) {
-    const args = ['update', ...packages];
+    const args = ['update'];
 
     // 指定 modules 安装目录
     if (this.modulesFolder) {
       args.push('--modules-folder', this.modulesFolder);
+    }
+
+    if (packages.length > 0) {
+      args.push(...packages);
     }
 
     const result = await execa('npm', args, {
