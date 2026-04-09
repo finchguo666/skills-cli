@@ -38,10 +38,7 @@ module.exports = async function install() {
 
     spin.succeed('Skills 安装完成');
 
-    // 4. 输出已安装的 Skills
-    const deps = await skillsJson.getDependencies();
-    const devDeps = await skillsJson.getDevDependencies();
-    const allDeps = { ...deps, ...devDeps };
+    // 输出已安装的 Skills
     const skillNames = Object.keys(allDeps);
 
     if (skillNames.length > 0) {
