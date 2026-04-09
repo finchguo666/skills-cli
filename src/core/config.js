@@ -43,7 +43,13 @@ class ConfigManager {
   // 优先级管理
   async getPriorities() {
     await this.init();
-    return await fs.readJson(this.priorityPath);
+    try {
+      return await fs.readJson(this.priorityPath);
+    } catch (error) {
+      // 如果文件损坏或不存在，返回空对象
+      await fs.writeJson(this.priorityPath, {}, { spaces: 2 });
+      return {};
+    }
   }
 
   async setPriority(skillName, priority) {
