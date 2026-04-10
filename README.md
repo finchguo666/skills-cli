@@ -121,6 +121,9 @@ skills up
 
 # 登录 npm（发布时需要）
 skills login
+
+# 清理 skills_modules 目录
+skills clean
 ```
 
 ---
@@ -320,6 +323,7 @@ npm unpublish @skills-cli/my-skill@1.0.0
 | `skills info <package>` | - | 查看 Skill 详情 |
 | `skills login` | - | 登录 npm |
 | `skills list` | `ls` | 列出已安装 |
+| `skills clean` | - | 清理 skills_modules 目录 |
 
 **Options:**
 - `skills add -D <pkg>` - 保存到 devDependencies
