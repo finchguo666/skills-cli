@@ -41,7 +41,6 @@ skills init
   "installDirectory": "skills_modules",
   "dependencies": {},
   "devDependencies": {},
-  "priorityOverrides": {},
   "config": {}
 }
 ```
@@ -151,30 +150,6 @@ const code = vueSkill.generateVueCrudPage({
 fs.writeFileSync('UserPage.vue', code);
 ```
 
-### 优先级系统说明
-
-Skills 支持优先级覆盖，当多个 Skill 提供相同能力时，高优先级的会覆盖低优先级：
-
-- 优先级范围：**0 - 100**
-- 默认优先级：**50**
-- **数字越大优先级越高**
-
-你可以在项目级 `skills.json` 中覆盖某个 Skill 的优先级：
-
-```json
-{
-  "name": "my-project",
-  "dependencies": {
-    "@skills-cli/vue2-springboot-mybatis": "^1.0.0",
-    "@my-org/custom-vue2-skill": "^1.0.0"
-  },
-  "priorityOverrides": {
-    "@my-org/custom-vue2-skill": 90
-  }
-}
-```
-
-这样自定义 Skill 就会覆盖官方 Skill 的相同能力。
 
 ### 完整示例：代码生成器
 
@@ -242,7 +217,6 @@ skills init
   "name": "my-skill",
   "version": "1.0.0",
   "description": "我的自定义 Skill",
-  "priority": 50,
   "tags": ["vue", "frontend", "code-generation"],
   "capabilities": ["generate-vue-component", "generate-vue-crud"]
 }
@@ -255,7 +229,6 @@ skills init
 | `name` | string | ✅ | Skill 名称 |
 | `version` | string | ✅ | 版本号 |
 | `description` | string | - | Skill 描述 |
-| `priority` | number | - | 优先级 0-100，默认 50 |
 | `tags` | string[] | - | 标签，用于搜索 |
 | `capabilities` | string[] | - | 能力列表，声明这个 Skill 能做什么 |
 

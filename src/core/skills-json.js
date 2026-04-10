@@ -104,7 +104,6 @@ class SkillsJson {
       installDirectory: 'skills_modules',
       dependencies: {},
       devDependencies: {},
-      priorityOverrides: {},
       config: {}
     };
     await this.write(template);
